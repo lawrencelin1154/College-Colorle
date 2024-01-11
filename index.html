@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>College Colorle</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      margin: 50px;
+    }
+
+    #teamName {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    #colorDisplay {
+      display: flex;
+      justify-content: space-around;
+      width: 300px;
+      height: 150px;
+      border: 2px solid #000;
+      margin: 10px auto;
+    }
+
+    .colorBox {
+      flex: 1;
+    }
+
+    #attempts {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    #guessInput {
+      padding: 8px;
+      font-size: 16px;
+      border-radius: 2px;
+      border: 1px solid #000;
+    }
+
+    #submitBtn {
+      padding: 8px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 2px;
+      border: 1px solid #000;
+      background-color: rgb(223, 223, 223);
+    }
+
+    #newGame {
+      padding: 8px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 2px;
+      border: 1px solid #000;
+      background-color: rgb(223, 223, 223);
+      margin-top:auto;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    canvas {
+	cursor: crosshair;
+	display: block;
+}
+
+    
+  </style>
+</head>
+<body>
+    
+  <h1>College Colorle</h1>
+
+  <div id="teamName">Guess the team</div>
+  <div id="colorDisplay" class="colorBox"></div>
+
+  <div id="attempts">Attempts left: <span id="attemptsLeft">3</span></div>
+
+  <input type="text" id="guessInput" placeholder="Enter your guess">
+  <button id="submitBtn" onclick="checkGuess()">Submit Guess</button>
+  <button id="newGame" onclick="reset()">New Game</button>
+
+  <div id="result"></div>
+
+  <script>
+    const teams = [
+  { name: 'Air Force', colors: ['#00308f', '#a6a6a8'] },
+  { name: 'Akron', colors: ['#002147', '#918b4c'] },
+  { name: 'Alabama', colors: ['#9e1b32', '#FFFFFF'] },
+  { name: 'Appalachian State', colors: ['#222222', '#ffcc00'] },
+  { name: 'Arizona', colors: ['#AB0520', '#0C234B'] },
+  { name: 'Arizona State', colors: ['#990033', '#FFB310'] },
+  { name: 'Arkansas', colors: ['#9D2235', '#FFFFFF'] },
+  { name: 'Arkansas State', colors: ['#cc092f', '#000000'] },
+  { name: 'Army West Point', colors: ['#000000', '#d3bc8d'] },
+  { name: 'Auburn', colors: ['#0C2340', '#F26522'] },
+  { name: 'Ball State', colors: ['#BA0C2F', '#FFFFFF', '#000000'] },
+  { name: 'Baylor', colors: ['#003015', '#fecb00'] },
+  { name: 'Boise State', colors: ['#09347A', '#F1632A'] },
+  { name: 'Boston College', colors: ['#910039', '#B38F59'] },
+  { name: 'Bowling Green', colors: ['#4F2C1D', '#FE5000'] },
+  { name: 'Buffalo', colors: ['#005bbb', '#FFFFFF'] },
+  { name: 'BYU', colors: ['#002255', '#FFFFFF'] },
+  { name: 'California', colors: ['#041E42', '#FFC72C'] },
+  { name: 'Fresno State', colors: ['#C41230', '#002C76'] },
+  { name: 'UCLA', colors: ['#0072ce', '#ffc72c'] },
+  { name: 'UCF', colors: ['#000000', '#BA9B37'] },
+  { name: 'Central Michigan', colors: ['#6a0032', '#ffc82e'] },
+  { name: 'Charlotte', colors: ['#046a38', '#FFFFFF'] },
+  { name: 'Cincinnati', colors: ['#000000', '#E00122'] },
+  { name: 'Clemson', colors: ['#F56600', '#522D80'] },
+  { name: 'Colorado', colors: ['#000000', '#CFB87C', '#A2A4A3'] },
+  { name: 'Colorado State', colors: ['#1E4D2B', '#C8C372'] },
+  { name: 'UConn', colors: ['#000E2F', '#FFFFFF'] },
+  { name: 'Duke', colors: ['#001A57', '#FFFFFF'] },
+  { name: 'Eastern Michigan', colors: ['#006633', '#FFFFFF'] },
+  { name: 'East Carolina', colors: ['#592A8A', '#FDC82F'] },
+  { name: 'FIU', colors: ['#081E3F', '#B6862C'] },
+  { name: 'Florida', colors: ['#0021a5', '#FA4616'] },
+  { name: 'Florida Atlantic', colors: ['#003366', '#CC0000'] },
+  { name: 'Florida State', colors: ['#782F40', '#CEB888'] },
+  { name: 'Georgia', colors: ['#DA291C', '#000000'] },
+  { name: 'Georgia Southern', colors: ['#011e41', '#FFFFFF'] },
+  { name: 'Georgia State', colors: ['#0039A6', '#FFFFFF'] },
+  { name: 'Georgia Tech', colors: ['#C59353', '#FFFFFF'] },
+  { name: 'Hawaii', colors: ['#024731', '#FFFFFF', '#000000'] },
+  { name: 'Houston', colors: ['#C92839', '#FFFFFF'] },
+  { name: 'Illinois', colors: ['#e04e39', '#13294b'] },
+  { name: 'Indiana', colors: ['#990000', '#EEEDEB'] },
+  { name: 'Iowa', colors: ['#000000', '#FFE100'] },
+  { name: 'Iowa State', colors: ['#a6192e', '#FDC82F'] },
+  { name: 'Kansas', colors: ['#0051BA', '#E8000D'] },
+  { name: 'Kansas State', colors: ['#512888', '#FFFFFF'] },
+  { name: 'Kent State', colors: ['#002664', '#EAAB00'] },
+  { name: 'Kentucky', colors: ['#0033A0', '#FFFFFF'] },
+  { name: 'LSU', colors: ['#582c83', '#ffc72c'] },
+  { name: 'Louisiana Tech', colors: ['#003087', '#CB333B'] },
+  { name: 'Lafayette', colors: ['#ce181e', '#FFFFFF'] },
+  { name: 'ULM', colors: ['#800029', '#bd955a'] },
+  { name: 'Louisville', colors: ['#AD0000', '#000000'] },
+  { name: 'Marshall', colors: ['#006140', '#FFFFFF'] },
+  { name: 'Maryland', colors: ['#c8102e', '#000000', '#FFCD00'] },
+  { name: 'UMass', colors: ['#881c1c', '#FFFFFF'] },
+  { name: 'Memphis', colors: ['#0D3182', '#888C8F'] },
+  { name: 'UMiami', colors: ['#005030', '#f47321'] },
+  { name: 'Miami of Ohio', colors: ['#B61E2E', '#FFFFFF'] },
+  { name: 'Michigan', colors: ['#ffcb05', '#00274c'] },
+  { name: 'Michigan State', colors: ['#18453B', '#FFFFFF'] },
+  { name: 'Middle Tennessee', colors: ['#0066CC', '#FFFFFF'] },
+  { name: 'Minnesota', colors: ['#7a0019', '#ffcc33'] },
+  { name: 'Ole Miss', colors: ['#00205b', '#c8102e'] },
+  { name: 'Mississippi State', colors: ['#660000', '#FFFFFF'] },
+  { name: 'Missouri', colors: ['#000000', '#F1B82D'] },
+  { name: 'Navy', colors: ['#00205b', '#c5b783'] },
+  { name: 'Nebraska', colors: ['#e41c38', '#fdf2d9'] },
+  { name: 'Nevada', colors: ['#003366', '#807f84'] },
+  { name: 'UNLV', colors: ['#B10202', '#666666'] },
+  { name: 'New Mexico', colors: ['#B71234', '#C3C8C8'] },
+  { name: 'New Mexico State', colors: ['#8c0b42', '#FFFFFF'] },
+  { name: 'North Carolina', colors: ['#7BAFD4', '#FFFFFF'] },
+  { name: 'NC State', colors: ['#CC0000', '#FFFFFF'] },
+  { name: 'North Texas', colors: ['#00853E', '#FFFFFF'] },
+  { name: 'NIU', colors: ['#ba0c2f', '#000000'] },
+  { name: 'Northwestern', colors: ['#4E2A84', '#FFFFFF'] },
+  { name: 'Notre Dame', colors: ['#0C2340', '#C99700'] },
+  { name: 'Ohio University', colors: ['#00694E', '#FFFFFF'] },
+  { name: 'Ohio State', colors: ['#bb0000', '#666666'] },
+  { name: 'Oklahoma', colors: ['#841617', '#FDF9D8'] },
+  { name: 'Oklahoma State', colors: ['#FF7300', '#000000'] },
+  { name: 'Old Dominion', colors: ['#05344C', '#7c878e', '#92c1e9'] },
+  { name: 'Oregon', colors: ['#154733', '#FEE123'] },
+  { name: 'Oregon State', colors: ['#C34500', '#000000'] },
+  { name: 'Penn State', colors: ['#041e42', '#FFFFFF'] },
+  { name: 'Pittsburgh', colors: ['#1c2957', '#cdb87d'] },
+  { name: 'Purdue', colors: ['#000000', '#CEB888'] },
+  { name: 'Rice', colors: ['#002469', '#5e6062'] },
+  { name: 'Rutgers', colors: ['#d21034'] },
+  { name: 'San Diego State', colors: ['#C41230', '#000000'] },
+  { name: 'San Jose State', colors: ['#0055A2', '#FFFFFF', '#E5A823'] },
+  { name: 'South Alabama', colors: ['#00205B', '#FFFFFF', '#BF0D3E'] },
+  { name: 'South Carolina', colors: ['#73000A', '#000000'] },
+  { name: 'South Florida', colors: ['#006747', '#CFC493'] },
+  { name: 'USC', colors: ['#990000', '#FFCC00'] },
+  { name: 'SMU', colors: ['#354ca1', 'cd2027'] },
+  { name: 'Southern Miss', colors: ['#000000', '#FDC737'] },
+  { name: 'Stanford', colors: ['#8C1515', '#FFFFFF'] },
+  { name: 'Syracuse', colors: ['#D44500','#000E54'] },
+  { name: 'TCU', colors: ['#4d1979', '#FFFFFF'] },
+  { name: 'Temple', colors: ['#990033', '#FFFFFF'] },
+  { name: 'Tennessee', colors: ['#FF8200', '#FFFFFF'] },
+  { name: 'Texas', colors: ['#BF5700', '#FFFFFF'] },
+  { name: 'Texas A&M', colors: ['#500000', '#FFFFFF'] },
+  { name: 'Texas State', colors: ['#501214', '#8D734A'] },
+  { name: 'Texas Tech', colors: ['#CC0000', '#000000'] },
+  { name: 'UTEP', colors: ['#002147', '#FF5600', '#B2B4B3'] },
+  { name: 'UTSA', colors: ['#0c2340', '#FFFFFF', '#f15a22'] },
+  { name: 'Toledo', colors: ['#002569', '#ffce00'] },
+  { name: 'Troy', colors: ['#862633', '#8a8d8f', '#000000'] },
+  { name: 'Tulane', colors: ['#005837', '#0082ba'] },
+  { name: 'Tulsa', colors: ['#c5b783', '#002d72', '#c8102e'] },
+  { name: 'Utah', colors: ['#CC0000', '#FFFFFF'] },
+  { name: 'Utah State', colors: ['#0F2439', '#FFFFFF', '#9D968D'] },
+  { name: 'Vanderbilt', colors: ['#000000', '#997F3D'] },
+  { name: 'Virginia', colors: ['#041e42', '#fa4616'] },
+  { name: 'Virginia Tech', colors: ['#660000', '#FF6600'] },
+  { name: 'Wake Forest', colors: ['#000000', '#9E7E38'] },
+  { name: 'Washington', colors: ['#363c74', '#e8d3a2'] },
+  { name: 'Washngton State', colors: ['#981e32', '#5e6a71'] },
+  { name: 'West Virginia', colors: ['#002855', '#EAAA00'] },
+  { name: 'Western Kentucky', colors: ['#B01E24', '#FFFFFF'] },
+  { name: 'Western Michigan', colors: ['#6c4023', '#b5a167'] },
+  { name: 'Wisconsin', colors: ['#c5050c', '#FFFFFF'] },
+  { name: 'Wyoming', colors: ['#492f24', '#ffc425'] }
+    ];
+
+    let currentTeam;
+    let attemptsLeft = 3;
+
+    function newGame() {// Reset attempts
+      
+      attemptsLeft = 3;
+      document.getElementById('attemptsLeft').textContent = attemptsLeft;
+
+      
+      currentTeam = teams[Math.floor(Math.random() * teams.length)];
+
+     
+      const colorDisplay = document.getElementById('colorDisplay');
+      colorDisplay.innerHTML = '';
+      currentTeam.colors.forEach(color => {
+        const colorBox = document.createElement('div');
+        colorBox.style.backgroundColor = color;
+        colorBox.classList.add('colorBox');
+        colorDisplay.appendChild(colorBox);
+      });
+
+      
+      document.getElementById('result').textContent = '';
+    }
+
+    function checkGuess() {
+      const guessInput = document.getElementById('guessInput').value.trim().toLowerCase();
+
+      if (guessInput === currentTeam.name.toLowerCase()) {// Correct guess
+
+        document.getElementById('result').textContent = 'Congratulations! You guessed it!';
+        document.getElementById('result').style.color = 'green';
+        disableInput();
+        
+      } else {// Incorrect guess
+        
+        attemptsLeft--;
+        document.getElementById('attemptsLeft').textContent = attemptsLeft;
+
+        if (attemptsLeft === 0) {// No more attempts left
+          
+          document.getElementById('result').textContent = `Sorry, you're out of attempts. The correct answer was ${currentTeam.name}.`;
+          document.getElementById('result').style.color = 'red';
+          disableInput();
+        } else {// Display hint for the next attempt
+          
+          document.getElementById('guessInput').value = "";
+          document.getElementById('result').textContent = 'Try again!';
+          document.getElementById('result').style.color = 'orange';
+        }
+      }
+    }
+
+    function reset(){
+        location.reload();
+    }
+
+    function disableInput() {
+      document.getElementById('guessInput').disabled = true;
+      document.getElementById('submitBtn').disabled = true;
+    }
+
+
+    window.onload = newGame;
+  </script>
+</body>
+</html>
