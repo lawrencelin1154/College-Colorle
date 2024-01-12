@@ -215,31 +215,7 @@
   { name: 'West Virginia', colors: ['#002855', '#EAAA00'] },
   { name: 'Western Kentucky', colors: ['#B01E24', '#FFFFFF'] },
   { name: 'Western Michigan', colors: ['#6c4023', '#b5a167'] },
-  { name: 'Wisconsin', colors: ['#c5050c', '#FFFFFF'] },
-  { name: 'Wyoming', colors: ['#492f24', '#ffc425'] }
-    ];
-
-    let currentTeam;
-    let attemptsLeft = 3;
-
-    function newGame() {// Reset attempts
-      
-      attemptsLeft = 3;
-      document.getElementById('attemptsLeft').textContent = attemptsLeft;
-
-      
-      currentTeam = teams[Math.floor(Math.random() * teams.length)];
-
-     
-      const colorDisplay = document.getElementById('colorDisplay');
-      colorDisplay.innerHTML = '';
-      currentTeam.colors.forEach(color => {
-        const colorBox = document.createElement('div');
-        colorBox.style.backgroundColor = color;
-        colorBox.classList.add('colorBox');
-        colorDisplay.appendChild(colorBox);
-      });
-
+ 
       
       document.getElementById('result').textContent = '';
     }
